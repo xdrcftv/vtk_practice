@@ -44,6 +44,6 @@ ResArray = ndinter.zoom(ArrayDicom, ConstPixelSpacing, order=1)
 
 pyplot.axes().set_aspect('equal','datalim')
 pyplot.set_cmap(pyplot.gray())
-pyplot.pcolormesh(x, y, numpy.flipud(numpy.rot90(ArrayDicom[:,:,30])))
+pyplot.pcolormesh(x, y, numpy.rot90(ArrayDicom[:,:,30]))
 pyplot.show()
 

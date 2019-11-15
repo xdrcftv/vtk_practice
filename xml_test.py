@@ -1,29 +1,44 @@
+
+#작성자: 이준영
+#작성일: 2019_11_15
+
+import vtk
+from vtk.util import numpy_support
 import os
-import xml.etree.ElementTree as ET
+import numpy
+from matplotlib import pyplot, cm
+import scipy.ndimage.interpolation as ndinter
 
+PathDicom = 'C:/Users/HH211/Desktop/BNCT_TEMP_20190812/CT_Image'
+reader = vtk.vtkDICOMImageReader()
+reader.SetDirectoryName(PathDicom)
+reader.Update()
 
-PathXml = 'C:/INFINITT/BNCT_TEMP'
+# Load dimensions using 'GetDataExtent'
+_extent = reader.GetDataExtent()
+ConstPixelDims = [_extent[1]-_extent[0]+1, _extent[3]-_extent[2]+1, _extent[5]-_extent[4]+1]
 
-whole_files = os.listdir(PathXml)
-list(whole_files)
-xml_file = os.path.join(PathXml, whole_files[0])
-xml_doc = ET.parse(xml_file)
+# Load spacing values
+ConstPixelSpacing = reader.GetPixelSpacing()
 
-root = xml_doc.getroot()
+x = numpy.arange(0.0, (ConstPixelDims[0]+1)*ConstPixelSpacing[0], ConstPixelSpacing[0])
+y = numpy.arange(0.0, -(ConstPixelDims[1]+1)*ConstPixelSpacing[1], -ConstPixelSpacing[1])
+z = numpy.arange(0.0, -(ConstPixelDims[2]+1)*ConstPixelSpacing[2], -ConstPixelSpacing[2])
 
-CT_image = root.find("CTImage")
+# Get the vtkimageData object from the reader
+ImageData = reader.GetOutput()
+# Get the vtkpointdata object from the vtkImageData object
+PointData = ImageData.GetPointData()
+# Ensure that only one array exists within the vtkpointdata object
+assert (PointData.GetNumberOfArrays()==1)
+# Get the vtkarray which is needed for the numpy_support.vtk_to_numpy function
+ArrayData = PointData.GetArray(0)
 
-CT_dir = []
-CT_slide = []
+# Convert the vtkarray to a Numpy array
+ArrayDicom = numpy_support.vtk_to_numpy(ArrayData)
 
-for child in CT_image:
-    CTD = CT_image.findtext(child.tag)
-    CT_dir.append(CTD)
-    CT_slide.append(dcm.dcmread(CTD))
+# Reshape the Numpy array to 3D using 'ConstPixelDims' as a 'shape'
+ArrayDicom = ArrayDicom.reshape(ConstPixelDims, order='F')
 
-Ref_CT = CT_slide[0]
-
-ConstPixelDims= (int(Ref_CT.Columns), int(Ref_CT.Rows), len(CT_slide))
-
-ConstPixelSpacing = (float(Ref_CT.PixelSpacing[1]),float(Ref_CT.PixelSpacing[0]), float(Ref_CT.SliceThickness))
-
+ResArray = ndinter.zoom(ArrayDicom, ConstPixelSpacing, order=1)
+print(ResArray[:,:,100])
