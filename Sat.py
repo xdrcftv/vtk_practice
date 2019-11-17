@@ -1,11 +1,7 @@
-
-# 작성자: 이준영
-# 작성일: 2019_11_15
-# home: PathDicom check
 import vtk
 from vtk.util import numpy_support
 import os
-import numpy
+import numpy as np
 from matplotlib import pyplot, cm
 import scipy.ndimage.interpolation as ndinter
 
@@ -21,7 +17,7 @@ ConstPixelDims = [_extent[1]-_extent[0]+1, _extent[3]-_extent[2]+1, _extent[5]-_
 # Load ImageOrientationPatient
 IOP = reader.GetImageOrientationPatient()
 
-# Load ImagePositionPatient
+# Load ImagePositionPatient 마지막 장의 IPP
 IPP = reader.GetImagePositionPatient()
 
 # Load spacing values
@@ -46,10 +42,6 @@ ArrayDicom = numpy_support.vtk_to_numpy(ArrayData)
 # Reshape the Numpy array to 3D using 'ConstPixelDims' as a 'shape'
 ArrayDicom = ArrayDicom.reshape(ConstPixelDims, order='F')
 
-ResArray = ndinter.zoom(ArrayDicom, ConstPixelSpacing, order=1)
+# ResArray = ndinter.zoom(ArrayDicom, ConstPixelSpacing, order=1)
 
-pyplot.axes().set_aspect('equal','datalim')
-pyplot.set_cmap(pyplot.gray())
-pyplot.pcolormesh(x, y, numpy.rot90(ArrayDicom[:,:,30]))
-pyplot.show()
-
+plotHeatmap(numpy)
