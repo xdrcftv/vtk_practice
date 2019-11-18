@@ -5,7 +5,7 @@
 import vtk
 from vtk.util import numpy_support
 import os
-import numpy
+import numpy as np
 from matplotlib import pyplot, cm
 import scipy.ndimage.interpolation as ndinter
 
@@ -21,9 +21,9 @@ ConstPixelDims = [_extent[1]-_extent[0]+1, _extent[3]-_extent[2]+1, _extent[5]-_
 # Load spacing values
 ConstPixelSpacing = reader.GetPixelSpacing()
 
-x = numpy.arange(0.0, (ConstPixelDims[0]+1)*ConstPixelSpacing[0], ConstPixelSpacing[0])
-y = numpy.arange(0.0, -(ConstPixelDims[1]+1)*ConstPixelSpacing[1], -ConstPixelSpacing[1])
-z = numpy.arange(0.0, -(ConstPixelDims[2]+1)*ConstPixelSpacing[2], -ConstPixelSpacing[2])
+x = np.arange(0.0, (ConstPixelDims[0]+1)*ConstPixelSpacing[0], ConstPixelSpacing[0])
+y = np.arange(0.0, -(ConstPixelDims[1]+1)*ConstPixelSpacing[1], -ConstPixelSpacing[1])
+z = np.arange(0.0, -(ConstPixelDims[2]+1)*ConstPixelSpacing[2], -ConstPixelSpacing[2])
 
 # Get the vtkimageData object from the reader
 ImageData = reader.GetOutput()
@@ -44,6 +44,6 @@ ResArray = ndinter.zoom(ArrayDicom, ConstPixelSpacing, order=1)
 
 pyplot.axes().set_aspect('equal','datalim')
 pyplot.set_cmap(pyplot.gray())
-pyplot.pcolormesh(x, y, numpy.rot90(ArrayDicom[:,:,30]))
+pyplot.pcolormesh(x, y, np.rot90(ArrayDicom[:,:,30]))
 pyplot.show()
 
